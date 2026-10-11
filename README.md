@@ -35,10 +35,11 @@ Claude reads the Wikipedia article, picks the facts, finds free photos, cuts the
 scenes, renders the video and tells you where it is. To edit it afterwards:
 
 ```bash
-npx hyperframes preview .
+npx -y hyperframes@0.8.33 preview .
 ```
 
-That opens HyperFrames Studio, where every cutout, tag and card is its own row on the timeline.
+That opens HyperFrames Studio: scrub the film, see each photo cutout as a layer on the timeline, click any
+element on the canvas to change it, and export a new MP4.
 
 ## What is in here
 
@@ -48,7 +49,8 @@ That opens HyperFrames Studio, where every cutout, tag and card is its own row o
 | `kit/collage-kit.mjs` | The look and the motion: sticker-border filter, torn paper, tags, stamps, 3D titles, halftone, and the timeline helpers. |
 | `tools/photos.mjs` | Searches Wikimedia Commons, downloads only reusable licences, writes `CREDITS.txt`. |
 | `tools/lift.swift` | Cuts the subject out of a photo with the Mac's built-in "lift subject". |
-| `tools/map.mjs` | Flat yellow-and-blue maps from Natural Earth data. |
+| `tools/map.mjs` | Flat yellow-and-blue maps from Natural Earth data. No country borders unless you ask for them. |
+| `tools/sheet.sh` | Contact sheets, so Claude looks at every photo and cutout before using it. |
 | `tools/sfx.sh` | Makes the paper sound effects with ffmpeg. |
 | `tools/mix.mjs` | Adds the sounds to the render. |
 | `examples/dabbawalas/` | A complete 15-second film to copy from. |
@@ -61,6 +63,9 @@ That opens HyperFrames Studio, where every cutout, tag and card is its own row o
   description.
 - **Facts.** The skill takes every number and name from the Wikipedia article and lists them in `FACTS.md`.
   Check them before you post.
+- **Maps have no country borders by default.** The border data shows disputed regions in ways that are wrong
+  or illegal to publish in some countries, India included.
+- **It takes about 15 minutes** from the prompt to a finished video on a recent Mac.
 - **Music is not included.** The video comes with paper sound effects; add your own track.
 
 ## Licence

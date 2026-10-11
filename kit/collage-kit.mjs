@@ -2,11 +2,11 @@
  * Collage kit: the look and the motion of a Vox-style paper-collage video, as building blocks for a HyperFrames
  * composition. Import it from your build.mjs and paste the pieces into the page you generate:
  *
- *   import { CSS, DEFS, HELPERS, FONTS, torn, cut, tag, stamp } from "../kit/collage-kit.mjs";
+ *   import { CSS, DEFS, HELPERS, FONTS, EYE, torn, cut, tag, stamp, card, title3d, pin, route } from "./collage-kit.mjs";
  *
  *   <head>  ${FONTS}  <style>${CSS}</style>
  *   <body>  ${DEFS}                      (the SVG filters: #cut = B&W photo with cream + red sticker border)
- *   <script> ... ${HELPERS} ...          (sm, enter, pop, drop, draw, count, boil: all seek-safe)
+ *   <script> ... ${HELPERS} ...          (sm, enter, pop, slam, draw, drawRoute, count, sheetIn, dive, boil: all seek-safe)
  *
  * Everything animates on one paused GSAP timeline `tl`, registered as window.__timelines["main"].
  */
@@ -36,6 +36,12 @@ export const tag = (id, text, x, y, kind = "") => `<div class="tag ${kind}" id="
 export const stamp = (id, src, text, x, y, pos = "50% 50%") => `<div class="stamp" id="${id}" style="left:${x}px; top:${y}px;"><div style="background-image:url(${src}); background-position:${pos};"></div><b>${text}</b></div>`;
 /** A torn paper card. Put your own content after it inside the same wrapper. */
 export const card = (id, x, y, w, h, inner, bg = "#F4EFE6") => `<div class="sheetw" id="${id}" style="left:${x}px; top:${y}px; width:${w}px; height:${h}px; opacity:0;"><div class="sheet" style="background:${bg}; clip-path:${torn(w, h, "ltrb", 10, 18)};"></div>${inner}</div>`;
+/** The ready eye close-up for the eye dive: kit/eye.jpg is 2000 px square, pupil centre and radius in its own pixels. */
+export const EYE = { size: 2000, pupil: [967, 967], r: 260 };
+/** Map pin (a dot with a black ring). Animate with pop("#id", t). */
+export const pin = (id, x, y, fill = "#D9352B") => `<div class="pin" id="${id}" style="left:${x - 15}px; top:${y - 15}px; background:${fill};"></div>`;
+/** A red dotted route that draws itself: put route("r1", "M x y Q cx cy x2 y2") inside an <svg>, then drawRoute("r1", t, 0.7). */
+export const route = (id, d) => `<defs><mask id="${id}m" maskUnits="userSpaceOnUse"><path id="${id}" d="${d}" stroke="#fff" stroke-width="18" fill="none" /></mask></defs><path d="${d}" stroke="#D9352B" stroke-width="6" stroke-linecap="round" stroke-dasharray="2 13" fill="none" mask="url(#${id}m)" />`;
 /** Big 3D paper-cut title (cream letters, black outline, extruded edge). */
 export const title3d = (id, text, x, y, size, extra = "") => `<div class="t3d" id="${id}" style="left:${x}px; top:${y}px; font-size:${size}px; ${extra}">${text}</div>`;
 
@@ -59,11 +65,13 @@ export const CSS = `
     .stamp div { width: 100%; height: 160px; background-size: cover; filter: grayscale(1) contrast(1.2) sepia(0.25); }
     .stamp b { display: block; margin-top: 8px; font-family: "Archivo Narrow", sans-serif; font-size: 22px; color: #B8322A; text-align: center; }
     .news { position: absolute; height: 120px; padding: 12px 18px; background: #E9E3D3; font-family: "Playfair Display", serif; font-weight: 700; font-size: 19px; line-height: 1.3; color: #2A2622; opacity: 0; overflow: hidden; filter: drop-shadow(0 6px 8px rgba(0,0,0,0.18)); }
+    .pin { position: absolute; width: 30px; height: 30px; border-radius: 50%; border: 4px solid #141210; opacity: 0; }
     .mk { fill: none; stroke: #D9352B; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; opacity: 0; }
     .paint { position: absolute; font-family: "Permanent Marker", cursive; opacity: 0; }
     /* halftone print: a blurred grey photo under a dot screen, thresholded by a huge contrast */
     .ht { position: absolute; overflow: hidden; background: #fff; filter: contrast(22); }
-    .ht img { display: block; width: 100%; filter: grayscale(1) contrast(1.5) brightness(0.88) blur(1.2px); }
+    .ht img { display: block; width: 100%; filter: grayscale(1) contrast(1.5) brightness(var(--ht-b, 0.88)) blur(1.2px); }   /* light photo blowing out to white? set style="--ht-b:0.6" on the .ht */
+    .xm { position: absolute; opacity: 0; }
     .ht:after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 50% 50%, #000 0%, #3a3a3a 50%, #b0b0b0 100%) 0 0 / 8px 8px; mix-blend-mode: screen; }
     #grain { position: absolute; inset: -60px; pointer-events: none; mix-blend-mode: multiply; opacity: 0.55;
              background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='420' height='420'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.45  0 0 0 0 0.4  0 0 0 0 0.33  0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
@@ -98,6 +106,8 @@ export const HELPERS = `
     const slam = (sel, at, rot) => tl.fromTo(sel, { opacity: 0, scale: 2, rotation: (rot || 0) + 8 }, { opacity: 1, scale: 1, rotation: rot || 0, duration: 0.2, ease: "power4.in", immediateRender: false }, at);
     // hand-drawn marker: draw("#circle1", 3.2, 0.35) on a <path class="mk">
     const draw = (sel, at, d) => { const el = document.querySelector(sel); const L = el.getTotalLength(); tl.fromTo(sel, { strokeDasharray: L, strokeDashoffset: L, opacity: 1 }, { strokeDashoffset: 0, opacity: 1, duration: d, ease: "power1.inOut", immediateRender: false }, at); };
+    // reveal a dotted route made with route(): drawRoute("r1", 6.7, 0.7)
+    const drawRoute = (id, at, d) => { const el = document.getElementById(id); const L = el.getTotalLength(); tl.fromTo(el, { strokeDasharray: L, strokeDashoffset: L }, { strokeDashoffset: 0, duration: d, ease: "power1.inOut", immediateRender: true }, at); };
     const count = (sel, from, to, at, d) => { const o = { n: from }; tl.fromTo(o, { n: from }, { n: to, duration: d, ease: "power2.out", immediateRender: false, onUpdate: () => { document.querySelector(sel).textContent = Math.round(o.n); } }, at); };
     // a torn sheet sliding over the previous scene: sheetIn("#s2w", 4.05, "x", 2040)
     const sheetIn = (sel, at, axis, from) => tl.fromTo(sel, { [axis]: from }, { [axis]: 0, immediateRender: true, duration: 0.42, ease: "power3.inOut" }, at);

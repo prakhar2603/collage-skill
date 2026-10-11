@@ -127,8 +127,8 @@ const html = `<!doctype html>
         </div>
 
         <!-- ============ S4: 1890 ============ -->
-        <div class="sheetw" id="s4w" style="left:-60px; top:0; width:${W + 60}px; height:${H}px;">
-          <div class="sheet" style="clip-path:${torn(W + 60, H, "r", 24, 26)}; background:#E6DCC6; overflow:hidden;">
+        <div class="sheetw" id="s4w" style="left:-60px; top:0; width:${W + 180}px; height:${H}px;">
+          <div class="sheet" style="clip-path:${torn(W + 180, H, "r", 24, 26)}; background:#E6DCC6; overflow:hidden;">
             <img src="${IMG("map1895.jpg")}" style="position:absolute; left:300px; top:-500px; width:1500px; opacity:0.16; mix-blend-mode:multiply; filter:grayscale(1);" alt="" />
             <div class="serif" id="yr" style="position:absolute; left:150px; top:120px; font-size:230px; opacity:0;">2026</div>
             <div class="tag y" id="t41" style="left:156px; top:420px;">Mahadeo Havaji Bachche</div>
@@ -221,7 +221,7 @@ const html = `<!doctype html>
     tl.fromTo("#s3w", { scale: 1 }, { scale: 1.035, transformOrigin: "1000px 600px", duration: 3.6, ease: "power1.inOut", immediateRender: false }, 7.1);
 
     /* ===== S4 (10.9 - 14.9): back to 1890 ===== */
-    tl.fromTo("#s4w", { x: -${W + 140} }, { x: 0, immediateRender: true, duration: 0.42, ease: "power3.inOut" }, 10.65); ${sfx(10.6, "paper-slide", 1.1)}${sfx(10.6, "whoosh", 0.25)}
+    tl.fromTo("#s4w", { x: -${W + 260} }, { x: 0, immediateRender: true, duration: 0.42, ease: "power3.inOut" }, 10.65); ${sfx(10.6, "paper-slide", 1.1)}${sfx(10.6, "whoosh", 0.25)}
     tl.set("#s3w", { opacity: 0 }, 11.1);
     tl.set("#yr", { opacity: 1 }, 11);
     count("#yr", 2026, 1890, 11, 0.7); ${[0, 1, 2, 3, 4, 5, 6].map(k => sfx(11 + k * 0.09, "key-press", 0.35)).join("")}
