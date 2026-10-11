@@ -18,7 +18,7 @@ install this skill
 Or by hand:
 
 ```bash
-git clone <this repo> ~/.claude/skills/collage
+git clone https://github.com/prakhar2603/collage-skill ~/.claude/skills/collage
 cd ~/.claude/skills/collage/tools && npm install
 swiftc -O lift.swift -o lift        # macOS only
 ```
