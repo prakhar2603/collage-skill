@@ -1,0 +1,10 @@
+node_modules/
+tools/lift
+snapshots/
+renders/
+*.log
+sheet.jpg
+index.html
+sfx.json
+assets/sfx/
+.DS_Store
